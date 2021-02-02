@@ -1,0 +1,163 @@
+<html>
+<head>
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.12/dist/vue.js"></script>
+</head>
+<body>
+<div id="app1">
+<h1>YYMMDD to 3 character code</h1>
+<p>
+<input type="text" placeholder="YY" v-model="yyIn">
+<input type="text" placeholder="MM" v-model="mmIn">
+<input type="text" placeholder="DD" v-model="ddIn">
+--&gt;
+Code output: <input type="text" v-model="codeOutput">
+</p>
+<hr/>
+<h1>3 character code to YYMMDD</h1>
+<p>
+Code input: <input type="text" v-model="codeInput">--&gt;
+
+<input type="text" placeholder="YY" v-model="yyOut">
+<input type="text" placeholder="MM" v-model="mmOut">
+<input type="text" placeholder="DD" v-model="ddOut">
+</p>
+
+
+
+
+</div>
+<script language="javascript">
+
+const base82alphabet=`!"%&'()*+,-./0123456789:;,=>?ABCDEFGHIJKLMNOPQRSTUVWXYZ_abcdefghijklmnopqrstuvwxyz`;
+
+let examplecode='"W2';
+let date=base82date_to_YYMMDD(examplecode);
+console.log("date="+date);
+
+let exampledate="210509";
+let code=YYMMDD_to_base82date(exampledate);
+console.log("code="+code);
+
+
+function base82date_to_YYMMDD(b82date) {
+	let c1=b82date.charAt(0);
+	let c2=b82date.charAt(1);
+	let c3=b82date.charAt(2);
+
+	let i1=base82alphabet.indexOf(c1);
+	let i2=base82alphabet.indexOf(c2);
+	let i3=base82alphabet.indexOf(c3);
+
+	let d = i1*82*82+i2*82+i3;
+	let b = d.toString(2);
+	b="0".repeat(16-b.length)+b;
+
+	let yearbits=b.substr(0,7);
+	let monthbits=b.substr(7,4);
+	let daybits=b.substr(11,5);
+
+	let year=parseInt(yearbits,2);
+	let month=parseInt(monthbits,2);
+	let day=parseInt(daybits,2);
+
+	yearStr=(year <10 ? "0" : "")+year.toString();
+	monthStr=(month<10 ? "0" : "")+month.toString();
+	dayStr=(day<10 ? "0" : "")+day.toString();
+
+	return yearStr+monthStr+dayStr;
+}
+
+function YYMMDD_to_base82date(yymmdd) {
+    let yearStr = yymmdd.substr(0,2);
+    let monthStr = yymmdd.substr(2,2);
+    let dayStr = yymmdd.substr(4,2);
+    
+    let year=parseInt(yearStr);
+    let month=parseInt(monthStr);
+    let day=parseInt(dayStr);
+    
+    let yearbits = year.toString(2);
+    let monthbits = month.toString(2);
+    let daybits = day.toString(2);
+    
+    yearbits="0".repeat(7-yearbits.length)+yearbits;
+    monthbits="0".repeat(4-monthbits.length)+monthbits;
+    daybits="0".repeat(5-daybits.length)+daybits;
+    
+    let b=yearbits+monthbits+daybits;
+    let d=parseInt(b,2);
+    
+    let i1=Math.floor(d/82/82);
+    let i2=Math.floor((d-i1*82*82)/82);
+    let i3=d-i1*82*82-i2*82;
+
+	let c1=base82alphabet.substr(i1,1);
+	let c2=base82alphabet.substr(i2,1);
+	let c3=base82alphabet.substr(i3,1);
+
+	return c1+c2+c3;
+}
+
+
+let app1 = new Vue({
+  el: '#app1',
+  // define data - initial display text
+  data: {
+    yyIn: "",
+    mmIn: "",
+    ddIn: "",
+    codeInput: ""
+  },
+  computed: {
+    yymmddIn: function() {
+    	let yyDD="0".repeat(2-this.yyIn.length)+this.yyIn;
+    	let mmDD="0".repeat(2-this.mmIn.length)+this.mmIn;
+    	let ddDD="0".repeat(2-this.ddIn.length)+this.ddIn;
+    	return yyDD+mmDD+ddDD;
+    },
+    codeOutput: function() {
+    	return YYMMDD_to_base82date(this.yymmddIn);
+    },
+    yymmddOut: function() {
+    	if (this.codeInput !== undefined) {
+    	return base82date_to_YYMMDD(this.codeInput);
+    	} else {
+    	return "";
+    	}
+    },
+    yyOut: function() {
+    	if (this.yymmddOut !== "") {
+    	return this.yymmddOut.substr(0,2);
+    	} else {
+    	return "";
+    	}
+    },
+    mmOut: function() {
+    	if (this.yymmddOut !== "") {
+    	return this.yymmddOut.substr(2,2);
+    	} else {
+    	return "";
+    	}
+    },
+    ddOut: function() {
+     	if (this.yymmddOut !== "") {
+    	return this.yymmddOut.substr(4,2);
+    	} else {
+    	return "";
+    	}
+   }
+    
+  
+  
+  }
+  
+});
+
+
+
+</script>
+
+
+</body>
+</html>
+
